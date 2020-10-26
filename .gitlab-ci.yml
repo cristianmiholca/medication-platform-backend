@@ -4,12 +4,12 @@ stages:
     - checkstyle
 build:
     stage: build
-    image: maven:3.3.9-jdk-11
+    image: maven:3.6.3-jdk-11
     script:
         - mvn clean package
 test:
     stage: test
-    image: maven:3.3.9-jdk-11
+    image: maven:3.6.3-jdk-11
     script: 
         - echo "Running tests"
         - mvn test
