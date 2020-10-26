@@ -20,3 +20,10 @@ checkstyle:
     script:
         - echo "Running checkstyle stage"
         - mvn checkstyle:check
+variables:
+    APP_NAME: online-medication-platform
+    DB_IP: ec2-54-247-107-109.eu-west-1.compute.amazonaws.com
+    DB_PORT: 5432
+    DB_USER: iqojpdotmgdfbl
+    DB_PASSWORD: 15d31bcf84c9b8563ff0bbc44fb7b7dd6599bdcd87432654a0a27a4d1fe6ca99
+    DB_DBNAME: d6u7d0a9gveecq
