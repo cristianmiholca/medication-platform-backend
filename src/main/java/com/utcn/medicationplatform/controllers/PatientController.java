@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/patient")
+@RequestMapping(value = "/patients")
 @Slf4j
 public class PatientController {
 
@@ -31,7 +32,7 @@ public class PatientController {
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<Patient> getById(@PathVariable UUID id) {
         log.info("GET request for patient with id: {}", id);
         Optional<Patient> resultDB = patientService.findById(id);
@@ -41,7 +42,7 @@ public class PatientController {
         return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
     }
 
-    @GetMapping("/get/{username}")
+    @GetMapping("/getByUsername/{username}")
     public ResponseEntity<Patient> getByUsername(@PathVariable String username) {
         log.info("GET request for patient with username: {}", username);
         Optional<Patient> resultDB = patientService.findByUsername(username);
@@ -58,22 +59,29 @@ public class PatientController {
         return new ResponseEntity<>(patients, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/updateById/{id}")
     public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody Patient patient){
         log.info("PUT request for patient with id: {}", id);
         Optional<Patient> resultDB = patientService.findById(id);
         return updatePatient(patient, resultDB);
     }
 
-    @PutMapping("/update/{username}")
+    @PutMapping("/updateByUsername/{username}")
     public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody Patient patient) {
         log.info("PUT request for patient with username: {}", username);
         Optional<Patient> resultDB = patientService.findByUsername(username);
         return updatePatient(patient, resultDB);
     }
 
-    @DeleteMapping("/delete/{username}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable String username) {
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable UUID id) {
+        log.info("DELETE request for user with id: {}", id);
+        patientService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteByUsername/{username}")
+    public ResponseEntity<HttpStatus> deleteByUsername(@PathVariable String username) {
         log.info("DELETE request for user with username: {}", username);
         patientService.deleteByUsername(username);
         return new ResponseEntity<>(HttpStatus.OK);
