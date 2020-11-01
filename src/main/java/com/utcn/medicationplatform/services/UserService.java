@@ -48,4 +48,8 @@ public class UserService {
         userRepository.deleteAll();
     }
 
+    public Boolean existsByUsername(String username){
+        return userRepository.existsByUsername(username);
+    }
+
 }
