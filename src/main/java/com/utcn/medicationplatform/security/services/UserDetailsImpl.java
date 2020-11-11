@@ -3,6 +3,7 @@ package com.utcn.medicationplatform.security.services;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.utcn.medicationplatform.entities.User;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@EqualsAndHashCode
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
@@ -79,11 +81,4 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserDetailsImpl that = (UserDetailsImpl) o;
-        return Objects.equals(id, that.id);
-    }
 }
