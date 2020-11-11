@@ -1,6 +1,5 @@
 package com.utcn.medicationplatform.entities;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +8,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -19,7 +19,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(generator = "uuid2")

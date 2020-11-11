@@ -1,16 +1,10 @@
 package com.utcn.medicationplatform.controllers;
 
-import com.utcn.medicationplatform.entities.ERole;
-import com.utcn.medicationplatform.entities.Role;
-import com.utcn.medicationplatform.entities.User;
-import com.utcn.medicationplatform.payload.JwtResponse;
-import com.utcn.medicationplatform.payload.LoginRequest;
-import com.utcn.medicationplatform.payload.MessageResponse;
-import com.utcn.medicationplatform.payload.SignupRequest;
+import com.utcn.medicationplatform.entities.*;
+import com.utcn.medicationplatform.payload.*;
 import com.utcn.medicationplatform.security.jwt.JwtUtils;
 import com.utcn.medicationplatform.security.services.UserDetailsImpl;
-import com.utcn.medicationplatform.services.RoleService;
-import com.utcn.medicationplatform.services.UserService;
+import com.utcn.medicationplatform.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,9 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,6 +31,15 @@ public class AuthController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    PatientService patientService;
+
+    @Autowired
+    CaregiverService caregiverService;
+
+    @Autowired
+    DoctorService doctorService;
 
     @Autowired
     RoleService roleService;
@@ -67,43 +71,92 @@ public class AuthController {
                 roles));
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest){
-        if(userService.existsByUsername(signupRequest.getUsername())){
+    @PostMapping("/signup/patient")
+    public ResponseEntity<?> registerPatient(@RequestBody PatientSignupRequest patientSignupRequest){
+        if(userService.existsByUsername(patientSignupRequest.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
+        }
+        Role role = getRoleFromDB(ERole.ROLE_PATIENT);
+
+        Patient patient = new Patient();
+        patient.setUsername(patientSignupRequest.getUsername());
+        patient.setPassword(passwordEncoder.encode(patientSignupRequest.getPassword()));
+        patient.setRoles(new HashSet<>(){{add(role);}});
+        patient.setName(patientSignupRequest.getName());
+        patient.setGender(patientSignupRequest.getGender());
+        patient.setAddress(patientSignupRequest.getAddress());
+        patient.setBirthDate(stringToDate(patientSignupRequest.getBirthDate()));
+        if(patientSignupRequest.getCaregiverId() != null){
+            Caregiver caregiver = caregiverService.findById(patientSignupRequest.getCaregiverId())
+                    .orElseThrow(() -> new RuntimeException("Cannot find caregiver with given id!"));
+            patient.setCaregiver(caregiver);
+        }
+
+        patientService.save(patient);
+        return ResponseEntity.ok(new MessageResponse("Patient registered successfully!"));
+    }
+
+    @PostMapping("/signup/caregiver")
+    public ResponseEntity<?> registerCaregiver(@Valid @RequestBody CaregiverSignupRequest caregiverSignupRequest) {
+        if(userService.existsByUsername(caregiverSignupRequest.getUsername())){
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        User user = new User();
-        user.setUsername(signupRequest.getUsername());
-        user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        Role role = getRoleFromDB(ERole.ROLE_CAREGIVER);
 
-        Set<String> rolesString = signupRequest.getRoles();
-        Set<Role> roles = new HashSet<>();
+        Caregiver caregiver = new Caregiver();
+        caregiver.setUsername(caregiverSignupRequest.getUsername());
+        caregiver.setPassword(passwordEncoder.encode(caregiverSignupRequest.getPassword()));
+        caregiver.setRoles(new HashSet<>(){{add(role);}});
+        caregiver.setName(caregiverSignupRequest.getName());
+        caregiver.setGender(caregiverSignupRequest.getGender());
+        caregiver.setAddress(caregiverSignupRequest.getAddress());
+        caregiver.setBirthDate(stringToDate(caregiverSignupRequest.getBirthDate()));
 
-        //TODO complete this
-        if(rolesString == null){
-            System.err.println("ROLE is empty");
-        }else{
-            rolesString.forEach(role -> {
-                switch (role) {
-                    case "doctor":
-                        Role doctorRole = roleService.findByName(ERole.ROLE_DOCTOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Role not found"));
-                        roles.add(doctorRole);
-                        break;
-                    default:
-                        Role userRole = roleService.findByName(ERole.ROLE_PATIENT)
-                                .orElseThrow(() -> new RuntimeException("Error: Role not found"));
-                }
-            });
+        caregiverService.save(caregiver);
+        return ResponseEntity.ok(new MessageResponse("Caregiver registered successfully!"));
+    }
+
+    @PostMapping("/signup/doctor")
+    public ResponseEntity<?> registerDoctor(@Valid @RequestBody DoctorSignupRequest doctorSignupRequest) {
+        if(userService.existsByUsername(doctorSignupRequest.getUsername())){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        user.setRoles(roles);
-        userService.save(user);
+        Role role = getRoleFromDB(ERole.ROLE_DOCTOR);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        Doctor doctor = new Doctor();
+        doctor.setUsername(doctorSignupRequest.getUsername());
+        doctor.setPassword(passwordEncoder.encode(doctorSignupRequest.getPassword()));
+        doctor.setRoles(new HashSet<>(){{add(role);}});
+        doctor.setName(doctorSignupRequest.getName());
+        doctor.setAddress(doctorSignupRequest.getAddress());
+        doctor.setBirthDate(stringToDate(doctorSignupRequest.getBirthDate()));
+
+        doctorService.save(doctor);
+        return ResponseEntity.ok(new MessageResponse("Doctor registered successfully!"));
     }
+
+    private Role getRoleFromDB(ERole eRole){
+        return roleService.findByName(eRole)
+                .orElseThrow(() -> new RuntimeException("Error: Role not found"));
+    }
+
+    private Date stringToDate(String date){
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        try {
+            return formatter.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
 }

@@ -1,17 +1,25 @@
 package com.utcn.medicationplatform.entities;
 
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@OnDelete(action = OnDeleteAction.CASCADE)
 public class Patient extends User{
 
     @Column(name = "name")
@@ -30,13 +38,7 @@ public class Patient extends User{
     @NotNull
     private String address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Caregiver caregiver;
 
-    @OneToMany(
-            mappedBy = "patient",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<MedicalRecord> medicalRecords;
 }

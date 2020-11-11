@@ -35,6 +35,10 @@ public class PatientService {
         return patientRepository.findAll();
     }
 
+    public List<Patient> findAllByCaregiverId(UUID caregiverId) {
+        return patientRepository.findPatientsByCaregiverId(caregiverId);
+    }
+
     public void delete(Patient patient){
         patientRepository.delete(patient);
     }

@@ -7,7 +7,7 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
 @Getter

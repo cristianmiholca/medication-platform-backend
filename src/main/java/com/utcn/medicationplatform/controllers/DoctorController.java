@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/doctor")
+@RequestMapping(value = "/doctors")
 @Slf4j
 public class DoctorController {
 
@@ -32,7 +32,17 @@ public class DoctorController {
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    @GetMapping("/get/{username}")
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Doctor> getById(@PathVariable UUID id){
+        log.info("GET request for doctor with id: {}", id);
+        Optional<Doctor> resultDB = doctorService.findById(id);
+        if(resultDB.isEmpty()){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+    }
+
+    @GetMapping("/getByUsername/{username}")
     public ResponseEntity<Doctor> getByUsername(@PathVariable String username){
         log.info("GET request for doctor with username: {}", username);
         Optional<Doctor> resultDB = doctorService.findByUsername(username);

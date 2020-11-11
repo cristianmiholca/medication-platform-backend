@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/user")
+@RequestMapping(value = "/users")
 @Slf4j
 public class UserController {
 
@@ -31,7 +31,17 @@ public class UserController {
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    @GetMapping("/get/{username}")
+    @GetMapping("/get/{id}")
+    public ResponseEntity<User> getById(@PathVariable("id") UUID id){
+        log.info("GET request for user with id: {}", id);
+        Optional<User> resultDB = userService.findById(id);
+        if(resultDB.isEmpty()){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+    }
+
+    @GetMapping("/getByUsername/{username}")
     public ResponseEntity<User> getByUsername(@PathVariable String username){
         log.info("GET request for user with username: {}", username);
         Optional<User> resultDB = userService.findByUsername(username);
@@ -68,5 +78,11 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<HttpStatus> delete(@PathVariable UUID id){
+        log.info("DELETE request for user with username: {}", id);
+        userService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }
