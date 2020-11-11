@@ -23,6 +23,10 @@ public class DoctorService {
         return doctorRepository.save(doctor).getId();
     }
 
+    public Optional<Doctor> findById(UUID id) {
+        return doctorRepository.findById(id);
+    }
+
     public Optional<Doctor> findByUsername(String username) {
         return doctorRepository.findByUsername(username);
     }

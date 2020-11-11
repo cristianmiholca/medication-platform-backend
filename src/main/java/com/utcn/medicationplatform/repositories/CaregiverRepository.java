@@ -11,5 +11,6 @@ import java.util.UUID;
 public interface CaregiverRepository extends JpaRepository<Caregiver, UUID> {
 
     Optional<Caregiver> findByUsername(String username);
+
     void deleteByUsername(String username);
 }

@@ -1,5 +1,7 @@
 package com.utcn.medicationplatform.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,8 +18,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "medical_record")
-public class MedicalRecord {
+@Table(name = "medication_plan")
+public class MedicationPlan {
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -39,16 +41,14 @@ public class MedicalRecord {
 
     @Column(name = "intake_interval")
     @NotNull
-    private int intakeInterval;
+    private String intakeInterval;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Patient patient;
 
-    @ManyToMany(cascade = {
-        CascadeType.PERSIST, CascadeType.MERGE
-    })
-    @JoinTable(name = "medical_record-medication",
-    joinColumns = @JoinColumn(name = "medical_record_id"),
-    inverseJoinColumns = @JoinColumn(name = "medication_id"))
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "medicationplan_medication",
+            joinColumns = @JoinColumn(name = "medicationplan_id"),
+            inverseJoinColumns = @JoinColumn(name = "medication_id"))
     private Set<Medication> medications;
 }

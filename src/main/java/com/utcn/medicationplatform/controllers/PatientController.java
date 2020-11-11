@@ -1,7 +1,13 @@
 package com.utcn.medicationplatform.controllers;
 
+import com.utcn.medicationplatform.dtos.PatientCreateDTO;
+import com.utcn.medicationplatform.dtos.PatientDTO;
 import com.utcn.medicationplatform.entities.Patient;
+import com.utcn.medicationplatform.mapper.PatientCreateMapper;
+import com.utcn.medicationplatform.mapper.PatientMapper;
+import com.utcn.medicationplatform.payload.PatientSignupRequest;
 import com.utcn.medicationplatform.services.PatientService;
+import com.utcn.medicationplatform.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/patients")
@@ -20,19 +27,30 @@ public class PatientController {
 
     private final PatientService patientService;
 
+    private final UserService userService;
+
+    private final PatientMapper patientMapper;
+
+
     @Autowired
-    public PatientController(PatientService patientService) {
+    PatientCreateMapper patientCreateMapper;
+
+    @Autowired
+    public PatientController(PatientService patientService, UserService userService, PatientMapper patientMapper) {
         this.patientService = patientService;
+        this.userService = userService;
+        this.patientMapper = patientMapper;
     }
 
+    //TODO edit this
     @PostMapping("/create")
-    public ResponseEntity<UUID> create(@RequestBody Patient patient) {
-        log.info("POST request for patient with id: {}", patient.getId());
-        UUID id = patientService.save(patient);
+    public ResponseEntity<UUID> create(@RequestBody PatientCreateDTO patientCreateDTO) {
+        log.info("POST request for patient: {}", patientCreateDTO);
+        UUID id = patientService.save(patientCreateMapper.dtoToEntity(patientCreateDTO));
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    @GetMapping("/getById/{id}")
+    @GetMapping(  "/getById/{id}")
     public ResponseEntity<Patient> getById(@PathVariable UUID id) {
         log.info("GET request for patient with id: {}", id);
         Optional<Patient> resultDB = patientService.findById(id);
@@ -53,24 +71,37 @@ public class PatientController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Patient>> getAll(){
+    public ResponseEntity<List<PatientDTO>> getAll(){
         log.info("GET request for all patients");
-        List<Patient> patients = patientService.findAll();
+        List<PatientDTO> patients = patientService.findAll()
+                .stream()
+                .map(patientMapper::entityToDto)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(patients, HttpStatus.OK);
+    }
+
+    @GetMapping("/getByCaregiver/{id}")
+    public ResponseEntity<List<PatientDTO>> getByCaregiver(@PathVariable UUID id) {
+        log.info("GET request for patients of caregiver with id: {}", id);
+        List<PatientDTO> patients = patientService.findAllByCaregiverId(id)
+                .stream()
+                .map(patientMapper::entityToDto)
+                .collect(Collectors.toList());
         return new ResponseEntity<>(patients, HttpStatus.OK);
     }
 
     @PutMapping("/updateById/{id}")
-    public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody Patient patient){
-        log.info("PUT request for patient with id: {}", id);
+    public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody PatientDTO patientDTO){
+        log.info("PUT request for patient: {}", patientDTO);
         Optional<Patient> resultDB = patientService.findById(id);
-        return updatePatient(patient, resultDB);
+        return updatePatient(patientMapper.dtoToEntity(patientDTO), resultDB);
     }
 
     @PutMapping("/updateByUsername/{username}")
-    public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody Patient patient) {
-        log.info("PUT request for patient with username: {}", username);
+    public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody PatientDTO patientDTO) {
+        log.info("PUT request for patient: {}", patientDTO);
         Optional<Patient> resultDB = patientService.findByUsername(username);
-        return updatePatient(patient, resultDB);
+        return updatePatient(patientMapper.dtoToEntity(patientDTO), resultDB);
     }
 
     @DeleteMapping("/deleteById/{id}")

@@ -1,7 +1,8 @@
 package com.utcn.medicationplatform.controllers;
 
+import com.utcn.medicationplatform.dtos.CaregiverDTO;
 import com.utcn.medicationplatform.entities.Caregiver;
-import com.utcn.medicationplatform.entities.User;
+import com.utcn.medicationplatform.mapper.CaregiverMapper;
 import com.utcn.medicationplatform.services.CaregiverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,71 +13,95 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/caregivers")
 @Slf4j
 public class CaregiverController {
 
-    //TODO rename all enddpoints
-
     private final CaregiverService caregiverService;
 
+    private final CaregiverMapper caregiverMapper;
+
     @Autowired
-    public CaregiverController(CaregiverService caregiverService) {
+    public CaregiverController(CaregiverService caregiverService, CaregiverMapper caregiverMapper) {
         this.caregiverService = caregiverService;
+        this.caregiverMapper = caregiverMapper;
     }
 
     @PostMapping("/create")
     public ResponseEntity<UUID> create(@RequestBody Caregiver caregiver) {
-        log.info("POST request for saving caregiver with id: {}", caregiver.getId());
+        log.info("POST request for saving caregiver: {}", caregiver);
         UUID id = caregiverService.save(caregiver);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Caregiver> getByID(@PathVariable UUID id){
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Caregiver> getByID(@PathVariable UUID id) {
         log.info("GET request for caregiver with id: {}", id);
         Optional<Caregiver> resultDB = caregiverService.findById(id);
-        if (resultDB.isEmpty()){
+        if (resultDB.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
     }
 
-    @GetMapping("/users/{username}")
-    public ResponseEntity<Caregiver> getByUsername(@PathVariable String username){
+    @GetMapping("/getByUsername/{username}")
+    public ResponseEntity<CaregiverDTO> getByUsername(@PathVariable String username) {
         log.info("GET request for caregiver with username: {}", username);
         Optional<Caregiver> resultDB = caregiverService.findByUsername(username);
-        if (resultDB.isEmpty()){
+        if (resultDB.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+        return new ResponseEntity<>(caregiverMapper.entityToDto(resultDB.get()), HttpStatus.OK);
     }
 
-    @GetMapping("/getALl")
-    public ResponseEntity<List<Caregiver>> getAll(){
+    @GetMapping("/getAll")
+    public ResponseEntity<List<CaregiverDTO>> getAll() {
         log.info("GET request for all caregivers");
-        List<Caregiver> caregivers = caregiverService.findAll();
+        List<CaregiverDTO> caregivers = caregiverService.findAll()
+                .stream()
+                .map(caregiverMapper::entityToDto).collect(Collectors.toList());
+
         return new ResponseEntity<>(caregivers, HttpStatus.OK);
     }
 
-    @PutMapping("/{username}")
-    public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody Caregiver caregiver) {
-        log.info("PUT request for caregiver with username: {}", username);
-        Optional<Caregiver> resultDB = caregiverService.findByUsername(username);
-        if(resultDB.isEmpty()){
+    @PutMapping("/updateById/{id}")
+    public ResponseEntity<HttpStatus> updateByUsername(@PathVariable UUID id, @RequestBody CaregiverDTO caregiverDTO) {
+        log.info("PUT request for caregiver with id: {}", id);
+        Optional<Caregiver> resultDB = caregiverService.findById(id);
+        if (resultDB.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        Caregiver caregiver = caregiverMapper.dtoToEntity(caregiverDTO);
+        caregiverService.save(caregiver);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/updateByUsername/{username}")
+    public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody CaregiverDTO caregiverDTO) {
+        log.info("PUT request for caregiver: {}", caregiverDTO);
+        Optional<Caregiver> resultDB = caregiverService.findByUsername(username);
+        if (resultDB.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Caregiver caregiver = caregiverMapper.dtoToEntity(caregiverDTO);
         Caregiver caregiverDB = resultDB.get();
         caregiver.setId(caregiverDB.getId());
         caregiverService.save(caregiver);
         return new ResponseEntity<>(HttpStatus.OK);
-
     }
 
-    @DeleteMapping("/{username}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable String username){
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable UUID id) {
+        log.info("DELETE request for caregiver with id: {}", id);
+        caregiverService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteByUsername/{username}")
+    public ResponseEntity<HttpStatus> deleteByUsername(@PathVariable String username) {
         log.info("DELETE request for caregiver with username: {}", username);
         caregiverService.deleteByUsername(username);
         return new ResponseEntity<>(HttpStatus.OK);

@@ -1,6 +1,6 @@
 package com.utcn.medicationplatform.services;
 
-import com.utcn.medicationplatform.entities.MedicalRecord;
+import com.utcn.medicationplatform.entities.MedicationPlan;
 import com.utcn.medicationplatform.repositories.MedicalRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,29 +10,29 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class MedicalRecordService {
+public class MedicationPlanService {
 
     private final MedicalRecordRepository medicalRecordRepository;
 
     @Autowired
-    public MedicalRecordService(MedicalRecordRepository medicalRecordRepository) {
+    public MedicationPlanService(MedicalRecordRepository medicalRecordRepository) {
         this.medicalRecordRepository = medicalRecordRepository;
     }
 
-    public UUID save(MedicalRecord medicalRecord){
-        return medicalRecordRepository.save(medicalRecord).getId();
+    public UUID save(MedicationPlan medicationPlan){
+        return medicalRecordRepository.save(medicationPlan).getId();
     }
 
-    public Optional<MedicalRecord> findById(UUID id){
+    public Optional<MedicationPlan> findById(UUID id){
         return medicalRecordRepository.findById(id);
     }
 
-    public List<MedicalRecord> findAll(){
+    public List<MedicationPlan> findAll(){
         return medicalRecordRepository.findAll();
     }
 
-    public void delete(MedicalRecord medicalRecord){
-        medicalRecordRepository.delete(medicalRecord);
+    public void delete(MedicationPlan medicationPlan){
+        medicalRecordRepository.delete(medicationPlan);
     }
 
     public void deleteById(UUID id){

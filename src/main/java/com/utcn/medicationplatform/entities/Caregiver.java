@@ -1,21 +1,22 @@
 package com.utcn.medicationplatform.entities;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Caregiver extends User{
 
     @Column(name = "name")
@@ -33,12 +34,5 @@ public class Caregiver extends User{
     @Column(name = "address")
     @NotNull
     private String address;
-
-    @OneToMany(
-            mappedBy = "caregiver",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private Set<Patient> patients;
 
 }

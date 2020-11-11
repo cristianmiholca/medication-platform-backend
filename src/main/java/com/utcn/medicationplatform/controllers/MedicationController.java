@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/medication")
+@RequestMapping(value = "/medications")
 @Slf4j
 public class MedicationController {
 
@@ -26,26 +26,16 @@ public class MedicationController {
 
     @PostMapping("/create")
     public ResponseEntity<UUID> create(@RequestBody Medication medication) {
-        log.info("POST request for saving medication with id: {}", medication.getId());
-        UUID id = medication.getId();
+        log.info("POST request for saving medication: {}", medication);
+        UUID id = medicationService.save(medication);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<Medication> getById(@PathVariable UUID id){
         log.info("GET request for medication with id: {}", id);
         Optional<Medication> resultDB = medicationService.findById(id);
         if(resultDB.isEmpty()){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
-    }
-
-    @GetMapping("/get/{name}")
-    public ResponseEntity<Medication> getByName(@PathVariable String name) {
-        log.info("GET request for medication with name: {}", name);
-        Optional<Medication> resultDB = medicationService.findByName(name);
-        if (resultDB.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
@@ -58,24 +48,17 @@ public class MedicationController {
         return new ResponseEntity<>(medications, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/updateById/{id}")
     public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody Medication medication){
         log.info("PUT request for medication with id: {}", id);
         Optional<Medication> resultDB = medicationService.findById(id);
         return updateMedication(medication, resultDB);
     }
 
-    @PutMapping("/update/{name}")
-    public ResponseEntity<HttpStatus> updateByName(@PathVariable String name, @RequestBody Medication medication) {
-        log.info("PUT request for medication: {}", name);
-        Optional<Medication> resultDB = medicationService.findByName(name);
-        return updateMedication(medication, resultDB);
-    }
-
-    @DeleteMapping("/delete/{name}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable String name){
-        log.info("DELETE request for medication: {}", name);
-        medicationService.deleteByName(name);
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable UUID id){
+        log.info("DELETE request for medication with id: {}", id);
+        medicationService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
