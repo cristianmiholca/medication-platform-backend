@@ -38,6 +38,14 @@ public class MedicationPlanController {
         return new ResponseEntity<>(medicationPlans, HttpStatus.OK);
     }
 
+    @GetMapping("/getByPatient/{id}")
+    public ResponseEntity<List<MedicationPlan>> getByPatient(@PathVariable UUID id){
+        log.info("GET request for medication plans for patient with id: {}", id);
+        List<MedicationPlan> medicationPlans = medicationPlanService.findByPatientId(id);
+
+        return new ResponseEntity<>(medicationPlans, HttpStatus.OK);
+    }
+
     @PutMapping("/updateById/{id}")
     public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody MedicationPlan medicationPlan){
         log.info("PUT request for medical record with id: {}", id);

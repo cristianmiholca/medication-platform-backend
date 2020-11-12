@@ -5,14 +5,12 @@ import com.utcn.medicationplatform.dtos.PatientDTO;
 import com.utcn.medicationplatform.entities.Patient;
 import com.utcn.medicationplatform.mapper.PatientCreateMapper;
 import com.utcn.medicationplatform.mapper.PatientMapper;
-import com.utcn.medicationplatform.payload.PatientSignupRequest;
 import com.utcn.medicationplatform.services.PatientService;
 import com.utcn.medicationplatform.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,7 +40,6 @@ public class PatientController {
         this.patientMapper = patientMapper;
     }
 
-    //TODO edit this
     @PostMapping("/create")
     public ResponseEntity<UUID> create(@RequestBody PatientCreateDTO patientCreateDTO) {
         log.info("POST request for patient: {}", patientCreateDTO);

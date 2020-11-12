@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -20,14 +19,14 @@ public class UserDetailsImpl implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID id;
+    private final UUID id;
 
-    private String username;
+    private final String username;
 
     @JsonIgnore
-    private String password;
+    private final String password;
 
-    private Collection<? extends GrantedAuthority> authorities;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
