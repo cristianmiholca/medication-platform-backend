@@ -18,6 +18,10 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
+    public Integer save(Role role) {
+        return roleRepository.save(role).getId();
+    }
+
     public Optional<Role> findByName(ERole name){
         return roleRepository.findByName(name);
     }
