@@ -27,7 +27,6 @@ public class DoctorController {
     @PostMapping("/create")
     public ResponseEntity<UUID> create(@RequestBody Doctor doctor){
         log.info("POST request for saving doctor with id: {}", doctor.getId());
-        System.err.println(doctor.getBirthDate());
         UUID id = doctorService.save(doctor);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
