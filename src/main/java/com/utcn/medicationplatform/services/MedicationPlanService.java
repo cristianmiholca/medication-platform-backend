@@ -1,7 +1,7 @@
 package com.utcn.medicationplatform.services;
 
 import com.utcn.medicationplatform.entities.MedicationPlan;
-import com.utcn.medicationplatform.repositories.MedicalRecordRepository;
+import com.utcn.medicationplatform.repositories.MedicationPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,35 +12,39 @@ import java.util.UUID;
 @Service
 public class MedicationPlanService {
 
-    private final MedicalRecordRepository medicalRecordRepository;
+    private final MedicationPlanRepository medicationPlanRepository;
 
     @Autowired
-    public MedicationPlanService(MedicalRecordRepository medicalRecordRepository) {
-        this.medicalRecordRepository = medicalRecordRepository;
+    public MedicationPlanService(MedicationPlanRepository medicationPlanRepository) {
+        this.medicationPlanRepository = medicationPlanRepository;
     }
 
     public UUID save(MedicationPlan medicationPlan){
-        return medicalRecordRepository.save(medicationPlan).getId();
+        return medicationPlanRepository.save(medicationPlan).getId();
     }
 
     public Optional<MedicationPlan> findById(UUID id){
-        return medicalRecordRepository.findById(id);
+        return medicationPlanRepository.findById(id);
     }
 
     public List<MedicationPlan> findAll(){
-        return medicalRecordRepository.findAll();
+        return medicationPlanRepository.findAll();
+    }
+
+    public List<MedicationPlan> findByPatientId(UUID id) {
+        return medicationPlanRepository.findByPatientId(id);
     }
 
     public void delete(MedicationPlan medicationPlan){
-        medicalRecordRepository.delete(medicationPlan);
+        medicationPlanRepository.delete(medicationPlan);
     }
 
     public void deleteById(UUID id){
-        medicalRecordRepository.deleteById(id);
+        medicationPlanRepository.deleteById(id);
     }
 
     public void deleteAll(){
-        medicalRecordRepository.deleteAll();
+        medicationPlanRepository.deleteAll();
     }
 
 }

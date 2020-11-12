@@ -43,7 +43,7 @@ public class MedicationPlan {
     @NotNull
     private String intakeInterval;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Patient patient;
 
     @ManyToMany(fetch = FetchType.EAGER)
