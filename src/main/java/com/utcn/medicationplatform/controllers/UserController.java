@@ -35,20 +35,14 @@ public class UserController {
     public ResponseEntity<User> getById(@PathVariable("id") UUID id){
         log.info("GET request for user with id: {}", id);
         Optional<User> resultDB = userService.findById(id);
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+        return resultDB.map(user -> new ResponseEntity<>(user, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getByUsername/{username}")
     public ResponseEntity<User> getByUsername(@PathVariable String username){
         log.info("GET request for user with username: {}", username);
         Optional<User> resultDB = userService.findByUsername(username);
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+        return resultDB.map(user -> new ResponseEntity<>(user, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getAll")
@@ -62,13 +56,13 @@ public class UserController {
     public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody User user){
         log.info("PUT request for user with username: {}", username);
         Optional<User> resultDB = userService.findByUsername(username);
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(resultDB.isPresent()){
+            User userDB = resultDB.get();
+            user.setId(userDB.getId());
+            userService.save(user);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        User userDB = resultDB.get();
-        user.setId(userDB.getId());
-        userService.save(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/delete/{username}")

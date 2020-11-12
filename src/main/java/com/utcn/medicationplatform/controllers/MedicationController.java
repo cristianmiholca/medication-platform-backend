@@ -35,10 +35,7 @@ public class MedicationController {
     public ResponseEntity<Medication> getById(@PathVariable UUID id){
         log.info("GET request for medication with id: {}", id);
         Optional<Medication> resultDB = medicationService.findById(id);
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+        return resultDB.map(medication -> new ResponseEntity<>(medication, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getAll")
@@ -63,14 +60,14 @@ public class MedicationController {
     }
 
     private ResponseEntity<HttpStatus> updateMedication(@RequestBody Medication medication, Optional<Medication> resultDB) {
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Medication medicationDB = resultDB.get();
-        medication.setId(medicationDB.getId());
-        medicationService.save(medication);
+        if(resultDB.isPresent()){
+            Medication medicationDB = resultDB.get();
+            medication.setId(medicationDB.getId());
+            medicationService.save(medication);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }

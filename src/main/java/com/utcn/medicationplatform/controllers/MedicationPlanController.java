@@ -50,13 +50,13 @@ public class MedicationPlanController {
     public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody MedicationPlan medicationPlan){
         log.info("PUT request for medical record with id: {}", id);
         Optional<MedicationPlan> resultDB = medicationPlanService.findById(id);
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(resultDB.isPresent()){
+            MedicationPlan medicationPlanDB = resultDB.get();
+            medicationPlan.setId(medicationPlanDB.getId());
+            medicationPlanService.save(medicationPlan);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        MedicationPlan medicationPlanDB = resultDB.get();
-        medicationPlan.setId(medicationPlanDB.getId());
-        medicationPlanService.save(medicationPlan);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/deleteById/{id}")
