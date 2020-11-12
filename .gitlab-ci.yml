@@ -30,7 +30,7 @@ variables:
     DB_DBNAME: d6u7d0a9gveecq
 deploy:
     stage: deploy
-    image: ruby:2.3
+    image: ruby:2.4
     script:
         - apt-get update -qy
         - apt-get install -y ruby-dev
