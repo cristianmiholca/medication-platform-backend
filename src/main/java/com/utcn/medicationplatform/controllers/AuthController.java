@@ -13,13 +13,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RestController
@@ -81,7 +87,7 @@ public class AuthController {
         Patient patient = new Patient();
         patient.setUsername(patientSignupRequest.getUsername());
         patient.setPassword(passwordEncoder.encode(patientSignupRequest.getPassword()));
-        patient.setRoles(new HashSet<>(){{add(role);}});
+        patient.setRoles(new HashSet<Role>(){{add(role);}});
         patient.setName(patientSignupRequest.getName());
         patient.setGender(patientSignupRequest.getGender());
         patient.setAddress(patientSignupRequest.getAddress());
@@ -109,7 +115,7 @@ public class AuthController {
         Caregiver caregiver = new Caregiver();
         caregiver.setUsername(caregiverSignupRequest.getUsername());
         caregiver.setPassword(passwordEncoder.encode(caregiverSignupRequest.getPassword()));
-        caregiver.setRoles(new HashSet<>(){{add(role);}});
+        caregiver.setRoles(new HashSet<Role>(){{add(role);}});
         caregiver.setName(caregiverSignupRequest.getName());
         caregiver.setGender(caregiverSignupRequest.getGender());
         caregiver.setAddress(caregiverSignupRequest.getAddress());
@@ -132,7 +138,7 @@ public class AuthController {
         Doctor doctor = new Doctor();
         doctor.setUsername(doctorSignupRequest.getUsername());
         doctor.setPassword(passwordEncoder.encode(doctorSignupRequest.getPassword()));
-        doctor.setRoles(new HashSet<>(){{add(role);}});
+        doctor.setRoles(new HashSet<Role>(){{add(role);}});
         doctor.setName(doctorSignupRequest.getName());
         doctor.setAddress(doctorSignupRequest.getAddress());
         doctor.setBirthDate(stringToDate(doctorSignupRequest.getBirthDate()));

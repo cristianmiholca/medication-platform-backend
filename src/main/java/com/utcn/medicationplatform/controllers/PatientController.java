@@ -51,20 +51,14 @@ public class PatientController {
     public ResponseEntity<Patient> getById(@PathVariable UUID id) {
         log.info("GET request for patient with id: {}", id);
         Optional<Patient> resultDB = patientService.findById(id);
-        if(resultDB.isEmpty()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+        return resultDB.map(patient -> new ResponseEntity<>(patient, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getByUsername/{username}")
     public ResponseEntity<Patient> getByUsername(@PathVariable String username) {
         log.info("GET request for patient with username: {}", username);
         Optional<Patient> resultDB = patientService.findByUsername(username);
-        if(resultDB.isEmpty()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+        return resultDB.map(patient -> new ResponseEntity<>(patient, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getAll")
@@ -116,13 +110,13 @@ public class PatientController {
     }
 
     private ResponseEntity<HttpStatus> updatePatient(@RequestBody Patient patient, Optional<Patient> resultDB) {
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(resultDB.isPresent()){
+            Patient patientDB = resultDB.get();
+            patient.setId(patientDB.getId());
+            patientService.save(patient);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        Patient patientDB = resultDB.get();
-        patient.setId(patientDB.getId());
-        patientService.save(patient);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }

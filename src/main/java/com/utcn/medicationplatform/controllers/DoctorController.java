@@ -35,20 +35,14 @@ public class DoctorController {
     public ResponseEntity<Doctor> getById(@PathVariable UUID id){
         log.info("GET request for doctor with id: {}", id);
         Optional<Doctor> resultDB = doctorService.findById(id);
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+        return resultDB.map(doctor -> new ResponseEntity<>(doctor, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getByUsername/{username}")
     public ResponseEntity<Doctor> getByUsername(@PathVariable String username){
         log.info("GET request for doctor with username: {}", username);
         Optional<Doctor> resultDB = doctorService.findByUsername(username);
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(resultDB.get(), HttpStatus.OK);
+        return resultDB.map(doctor -> new ResponseEntity<>(doctor, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getAll")
@@ -62,13 +56,13 @@ public class DoctorController {
     public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody Doctor doctor) {
         log.info("PUT request for doctor with username: {}", username);
         Optional<Doctor> resultDB = doctorService.findByUsername(username);
-        if(resultDB.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(resultDB.isPresent()){
+            Doctor doctorDB = resultDB.get();
+            doctor.setId(doctorDB.getId());
+            doctorService.save(doctor);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        Doctor doctorDB = resultDB.get();
-        doctor.setId(doctorDB.getId());
-        doctorService.save(doctor);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/delete/{username}")
