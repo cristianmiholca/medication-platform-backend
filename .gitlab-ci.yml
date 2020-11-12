@@ -36,5 +36,3 @@ deploy:
         - apt-get install -y ruby-dev
         - gem install dpl
         - dpl --provider=heroku --app=online-medication-platform --api-key=$HEROKU_API_KEY
-    only:
-        - production
