@@ -16,7 +16,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 registry.addMapping("/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
-                        .allowedOrigins("http://localhost:8081");
+                        .allowedOrigins("https://react-medication-platform.herokuapp.com/");
             }
         };
     }
