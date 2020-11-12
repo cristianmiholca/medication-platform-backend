@@ -28,7 +28,10 @@ variables:
     DB_PASSWORD: 15d31bcf84c9b8563ff0bbc44fb7b7dd6599bdcd87432654a0a27a4d1fe6ca99
     DB_DBNAME: d6u7d0a9gveecq
 deploy:
-    - apt-get -qy
+    stage: deploy
+    image: ruby:2.3
+    script:
+    - apt-get update -qy
     - apt-get install -y ruby-dev
     - gem install dpl
     - dpl --provider=heroku --app=online-medication-platform --api-key=$HEROKU_API_KEY
