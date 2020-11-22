@@ -1,6 +1,5 @@
 package com.utcn.medicationplatform.sensorsystem;
 
-import com.rabbitmq.client.ConnectionFactory;
 import com.utcn.medicationplatform.entities.Activity;
 import com.utcn.medicationplatform.entities.Patient;
 import com.utcn.medicationplatform.services.ActivityService;
@@ -11,8 +10,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,16 +19,12 @@ import java.util.UUID;
 public class ActivityConsumer {
 
     private static final String QUEUE_NAME = "activities";
-    private static final String HOST = "localhost";
 
     private final ActivityService activityService;
     private final PatientService patientService;
 
     @Autowired
     public ActivityConsumer(ActivityService activityService, PatientService patientService) {
-        ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost(HOST);
-
         this.activityService = activityService;
         this.patientService = patientService;
     }
