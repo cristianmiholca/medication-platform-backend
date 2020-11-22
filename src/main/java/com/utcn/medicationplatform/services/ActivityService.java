@@ -29,4 +29,8 @@ public class ActivityService {
         activityRepository.deleteById(id);
     }
 
+    public void deleteAll() {
+        activityRepository.deleteAll();
+    }
+
 }

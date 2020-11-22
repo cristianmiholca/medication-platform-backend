@@ -32,7 +32,7 @@ public class ActivityController {
 
     @GetMapping("/filterByRule/{number}")
     public ResponseEntity<List<Activity>> filterByRule(@PathVariable Integer number){
-        log.info("GET request for filter by rule {}", number);
+        log.info("GET request for filter by rule: {}", number);
         Predicate<Activity> predicate;
         switch (number) {
             case 1:
@@ -53,6 +53,15 @@ public class ActivityController {
         activities.stream()
                 .map(this::getActivityDuration)
                 .forEach(System.err::println);
+        return new ResponseEntity<>(activities, HttpStatus.OK);
+    }
+
+    @GetMapping("/clear")
+    public ResponseEntity<List<Activity>> clear(){
+        log.info("GET request for clear");
+        List<Activity> activities = activityService.findAll();
+        activityService.deleteAll();
+
         return new ResponseEntity<>(activities, HttpStatus.OK);
     }
 
