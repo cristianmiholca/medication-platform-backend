@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Component
 public class RpcServiceImpl extends UnicastRemoteObject implements RpcService {
 
-    private static final String RPC_NAME = "rmi://online-medication-platform.herokuapp.com:1900/rpc";
+    private static final String RPC_NAME = "rmi://localhost:1900/rpc";
     private final MedicationPlanService medicationPlanService;
 
     @Autowired
