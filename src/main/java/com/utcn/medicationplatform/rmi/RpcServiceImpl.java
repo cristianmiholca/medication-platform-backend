@@ -1,4 +1,4 @@
-package com.utcn.medicationplatform.rpc;
+package com.utcn.medicationplatform.rmi;
 
 import com.utcn.medicationplatform.entities.Medication;
 import com.utcn.medicationplatform.entities.MedicationPlan;
