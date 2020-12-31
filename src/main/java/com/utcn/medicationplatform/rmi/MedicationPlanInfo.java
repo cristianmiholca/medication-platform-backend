@@ -1,4 +1,4 @@
-package com.utcn.medicationplatform.rpc;
+package com.utcn.medicationplatform.rmi;
 
 import lombok.Data;
 
