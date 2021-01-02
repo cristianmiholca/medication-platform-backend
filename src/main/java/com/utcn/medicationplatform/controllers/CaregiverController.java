@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class CaregiverController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<UUID> create(@RequestBody Caregiver caregiver) {
         log.info("POST request for saving caregiver: {}", caregiver);
         UUID id = caregiverService.save(caregiver);
@@ -38,6 +40,7 @@ public class CaregiverController {
     }
 
     @GetMapping("/getById/{id}")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<Caregiver> getByID(@PathVariable UUID id) {
         log.info("GET request for caregiver with id: {}", id);
         Optional<Caregiver> resultDB = caregiverService.findById(id);
@@ -45,6 +48,7 @@ public class CaregiverController {
     }
 
     @GetMapping("/getByUsername/{username}")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<CaregiverDTO> getByUsername(@PathVariable String username) {
         log.info("GET request for caregiver with username: {}", username);
         Optional<Caregiver> resultDB = caregiverService.findByUsername(username);
@@ -52,6 +56,7 @@ public class CaregiverController {
     }
 
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<List<CaregiverDTO>> getAll() {
         log.info("GET request for all caregivers");
         List<CaregiverDTO> caregivers = caregiverService.findAll()
@@ -62,7 +67,8 @@ public class CaregiverController {
     }
 
     @PutMapping("/updateById/{id}")
-    public ResponseEntity<HttpStatus> updateByUsername(@PathVariable UUID id, @RequestBody CaregiverDTO caregiverDTO) {
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody CaregiverDTO caregiverDTO) {
         log.info("PUT request for caregiver with id: {}", id);
         Optional<Caregiver> resultDB = caregiverService.findById(id);
         if (resultDB.isPresent()) {
@@ -74,6 +80,7 @@ public class CaregiverController {
     }
 
     @PutMapping("/updateByUsername/{username}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody CaregiverDTO caregiverDTO) {
         log.info("PUT request for caregiver: {}", caregiverDTO);
         Optional<Caregiver> resultDB = caregiverService.findByUsername(username);
@@ -88,6 +95,7 @@ public class CaregiverController {
     }
 
     @DeleteMapping("/deleteById/{id}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> deleteById(@PathVariable UUID id) {
         log.info("DELETE request for caregiver with id: {}", id);
         caregiverService.deleteById(id);
@@ -95,6 +103,7 @@ public class CaregiverController {
     }
 
     @DeleteMapping("/deleteByUsername/{username}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> deleteByUsername(@PathVariable String username) {
         log.info("DELETE request for caregiver with username: {}", username);
         caregiverService.deleteByUsername(username);

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class DoctorController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<UUID> create(@RequestBody Doctor doctor){
         log.info("POST request for saving doctor with id: {}", doctor.getId());
         UUID id = doctorService.save(doctor);
@@ -32,6 +34,7 @@ public class DoctorController {
     }
 
     @GetMapping("/getById/{id}")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<Doctor> getById(@PathVariable UUID id){
         log.info("GET request for doctor with id: {}", id);
         Optional<Doctor> resultDB = doctorService.findById(id);
@@ -39,6 +42,7 @@ public class DoctorController {
     }
 
     @GetMapping("/getByUsername/{username}")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<Doctor> getByUsername(@PathVariable String username){
         log.info("GET request for doctor with username: {}", username);
         Optional<Doctor> resultDB = doctorService.findByUsername(username);
@@ -46,6 +50,7 @@ public class DoctorController {
     }
 
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<List<Doctor>> getAll(){
         log.info("GET request for all doctors");
         List<Doctor> doctors = doctorService.findAll();
@@ -53,6 +58,7 @@ public class DoctorController {
     }
 
     @PutMapping("/update/{username}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> updateByUsername(@PathVariable String username, @RequestBody Doctor doctor) {
         log.info("PUT request for doctor with username: {}", username);
         Optional<Doctor> resultDB = doctorService.findByUsername(username);
@@ -66,6 +72,7 @@ public class DoctorController {
     }
 
     @DeleteMapping("/delete/{username}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> delete(@PathVariable String username) {
         log.info("DELETE request for doctor with username: {}", username);
         doctorService.deleteByUsername(username);

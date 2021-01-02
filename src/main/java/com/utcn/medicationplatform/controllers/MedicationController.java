@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class MedicationController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<UUID> create(@RequestBody Medication medication) {
         log.info("POST request for saving medication: {}", medication);
         UUID id = medicationService.save(medication);
@@ -32,6 +34,7 @@ public class MedicationController {
     }
 
     @GetMapping("/getById/{id}")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<Medication> getById(@PathVariable UUID id){
         log.info("GET request for medication with id: {}", id);
         Optional<Medication> resultDB = medicationService.findById(id);
@@ -39,6 +42,7 @@ public class MedicationController {
     }
 
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<List<Medication>> getAll() {
         log.info("GET request for all medications");
         List<Medication> medications = medicationService.findAll();
@@ -46,6 +50,7 @@ public class MedicationController {
     }
 
     @PutMapping("/updateById/{id}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody Medication medication){
         log.info("PUT request for medication with id: {}", id);
         Optional<Medication> resultDB = medicationService.findById(id);
@@ -53,6 +58,7 @@ public class MedicationController {
     }
 
     @DeleteMapping("/deleteById/{id}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> deleteById(@PathVariable UUID id){
         log.info("DELETE request for medication with id: {}", id);
         medicationService.deleteById(id);

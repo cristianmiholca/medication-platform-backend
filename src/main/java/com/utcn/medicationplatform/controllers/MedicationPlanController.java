@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class MedicationPlanController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<UUID> create(@RequestBody MedicationPlan medicationPlan){
         log.info("POST request for medical record with id: {}", medicationPlan.getId());
         UUID id = medicationPlanService.save(medicationPlan);
@@ -32,6 +34,7 @@ public class MedicationPlanController {
     }
 
     @GetMapping("/getAll")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<List<MedicationPlan>> getAll(){
         log.info("GET request for all medical records");
         List<MedicationPlan> medicationPlans = medicationPlanService.findAll();
@@ -39,6 +42,7 @@ public class MedicationPlanController {
     }
 
     @GetMapping("/getByPatient/{id}")
+    @PreAuthorize("hasRole('ROLE_CAREGIVER') or hasRole('ROLE_DOCTOR') or hasRole('ROLE_PATIENT')")
     public ResponseEntity<List<MedicationPlan>> getByPatient(@PathVariable UUID id){
         log.info("GET request for medication plans for patient with id: {}", id);
         List<MedicationPlan> medicationPlans = medicationPlanService.findByPatientId(id);
@@ -47,6 +51,7 @@ public class MedicationPlanController {
     }
 
     @PutMapping("/updateById/{id}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> updateById(@PathVariable UUID id, @RequestBody MedicationPlan medicationPlan){
         log.info("PUT request for medical record with id: {}", id);
         Optional<MedicationPlan> resultDB = medicationPlanService.findById(id);
@@ -60,6 +65,7 @@ public class MedicationPlanController {
     }
 
     @DeleteMapping("/deleteById/{id}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<HttpStatus> delete(@PathVariable UUID id){
         log.info("DELETE request for medical record with id: {}", id);
         medicationPlanService.deleteById(id);
